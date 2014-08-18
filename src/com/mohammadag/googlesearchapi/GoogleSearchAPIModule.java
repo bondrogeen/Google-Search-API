@@ -48,7 +48,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		if (!lpparam.packageName.equals(Constants.GOOGLE_SEARCH_PACKAGE))
 			return;
 
-		Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
+	Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
         Context context = (Context) callMethod(activityThread, "getSystemContext");
 
         String versionName = context.getPackageManager().getPackageInfo(lpparam.packageName, 0).versionName;
