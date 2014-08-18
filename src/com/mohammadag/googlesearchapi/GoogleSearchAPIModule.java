@@ -84,7 +84,6 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		String SRF = "cby";
 		String SOI = "cuc";
 			
-			
 		String MVSCL = "a";
 		String CharSq = "hmu";
 		String CharSq2 = "cbs";
@@ -96,22 +95,20 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 			SRF = "bur";
 			SOI = "cmh";
 			
-			
 			MVSCL = "a";
 			CharSq = "heb";
 			CharSq2 = "bul";
 		} 
 		
 		if (Checker.equals("3.5.15.1254529.arm") || Checker.equals("3.5.14.1234234.arm")) {
-				SC = "bir";
-				VSCL = "bjb";
-				SRF = "bur";
-				SOI = "cmh";
+			SC = "bir";
+			VSCL = "bjb";
+			SRF = "bur";
+			SOI = "cmh";
 				
-				
-				MVSCL = "a";
-				CharSq = "hea";
-				CharSq2 = "bul";
+			MVSCL = "a";
+			CharSq = "hea";
+			CharSq2 = "bul";
 		}
 		
 
@@ -162,9 +159,9 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 					    	String ttMan = "a";
 						
 						if (Checker.equals("3.5.15.1254529.arm") || Checker.equals("3.5.14.1234234.arm") || Checker.equals("3.5.16.1262550.arm")) {
-								VSS = "mVoiceSearchServices";
-								VTS = "azL";
-								ttMan = "a";
+							VSS = "mVoiceSearchServices";
+							VTS = "azL";
+							ttMan = "a";
 						}
 								
 							
