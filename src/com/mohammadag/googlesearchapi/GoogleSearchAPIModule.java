@@ -159,12 +159,12 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 						//Hooks
 						String VSS = "mVoiceSearchServices";
 						String VTS = "aCT";
-					    String ttMan = "a";
+					    	String ttMan = "a";
 						
 						if (Checker.equals("3.5.15.1254529.arm") || Checker.equals("3.5.14.1234234.arm") || Checker.equals("3.5.16.1262550.arm")) {
-									VSS = "mVoiceSearchServices";
-									VTS = "azL";
-								    ttMan = "a";
+								VSS = "mVoiceSearchServices";
+								VTS = "azL";
+								ttMan = "a";
 						}
 								
 							
@@ -175,8 +175,8 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
                         // Google Search V3.5: azL
 						Object ttsManager = XposedHelpers.callMethod(mVoiceSearchServices, VTS);
 						try {
-                            // Google Search V3.4: a
-                            // Google Search V3.5: a
+                        // Google Search V3.4: a
+                        // Google Search V3.5: a
 							XposedHelpers.callMethod(ttsManager, ttMan, string, null, 0);
 						} catch (NoSuchMethodError e) {
 							e.printStackTrace();
@@ -203,12 +203,13 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		});
 
 		// obtainSearchResult
-        // Google Search V3.4: s
-        // Google Search V3.5: w
+        	// Google Search V3.4: s
+        	// Google Search V3.5: w
 		
 		
 		//Hooks
 		String SRFQ = "x";
+		
 		if (Checker.equals("3.5.16.1262550.arm")) {
 			SRFQ = "w";
 		}
@@ -235,16 +236,16 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 					mC = "a";
 				}
 				if (Checker.equals("3.5.15.1254529.arm")) {
-						qR = "mQueryChars";
-						mCac = "mCache";
-						mClo = "mClock";
-						mC = "a";
+					qR = "mQueryChars";
+					mCac = "mCache";
+					mClo = "mClock";
+					mC = "a";
 				}
 				if (Checker.equals("3.5.14.1234234.arm")) {
-							qR = "mQueryChars";
-							mCac = "mCache";
-							mClo = "mClock";
-							mC = "get";
+					qR = "mQueryChars";
+					mCac = "mCache";
+					mClo = "mClock";
+					mC = "get";
 				}
 						
 				
