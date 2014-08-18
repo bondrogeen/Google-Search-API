@@ -86,6 +86,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		
 		XposedBridge.log("Google Search Version" +Checker);
 		
+		//Hooks
 		SC = "bpn";
 		VSCL = "bpy";
 		SRF = "cby";
@@ -128,7 +129,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
         // com.google.android.search.core.SearchController
         // Google Search V3.4: azs
         // Google Search V3.5: bir
-        Class<?> SearchController = findClass(SC, lpparam.classLoader);
+        	Class<?> SearchController = findClass(SC, lpparam.classLoader);
 
 		// com.google.android.search.core.SearchController$MyVoiceSearchControllerListener
         // Google Search V3.4: bae
@@ -149,7 +150,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 			@Override
 			protected void afterHookedMethod(MethodHookParam param) throws Throwable {
 				
-				//Hook
+				//Hooks
 				String mCon = "mContext";
 				
 				final Object thisObject = param.thisObject;
@@ -163,7 +164,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 							return;
 
 						
-						//Hook
+						//Hooks
 						String VSS = "mVoiceSearchServices";
 						String VTS = "aCT";
 					    String ttMan = "a";
@@ -214,7 +215,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
         // Google Search V3.5: w
 		
 		
-		//Hook
+		//Hooks
 		String SRFQ = "x";
 		if (Checker.equals("3.5.16.1262550.arm")) {
 			SRFQ = "w";
