@@ -76,26 +76,18 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 			}
 		};
 		
-		String SC = null;
-		String VSCL = null;
-		String SRF = null;
-		String SOI = null;
-		String MVSCL = null;
-		String CharSq = null;
-		String CharSq2 = null;
-		
 		XposedBridge.log("Google Search Version" +Checker);
 		
 		//Hooks
-		SC = "bpn";
-		VSCL = "bpy";
-		SRF = "cby";
-		SOI = "cuc";
+		String SC = "bpn";
+		String VSCL = "bpy";
+		String SRF = "cby";
+		String SOI = "cuc";
 			
 			
-		MVSCL = "a";
-		CharSq = "hmu";
-		CharSq2 = "cbs";
+		String MVSCL = "a";
+		String CharSq = "hmu";
+		String CharSq2 = "cbs";
 		
 		
 		if (Checker.equals("3.5.16.1262550.arm")) {
