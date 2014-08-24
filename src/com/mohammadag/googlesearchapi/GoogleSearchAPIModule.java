@@ -273,13 +273,13 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 							return;
 						
 						Object mVoiceSearchServices = getObjectField(thisObject, mVoiceSearchServicesHookFinal);
-			// getLocalTtsManager
-                        // Google Search V3.4: asi
-                        // Google Search V3.5: azL
+						// getLocalTtsManager
+                        			// Google Search V3.4: asi
+                        			// Google Search V3.5: azL
 						Object ttsManager = XposedHelpers.callMethod(mVoiceSearchServices, ttsManagerHookFinal);
 						try {
-                        // Google Search V3.4: a
-                        // Google Search V3.5: a
+                        			// Google Search V3.4: a
+                        			// Google Search V3.5: a
 						XposedHelpers.callMethod(ttsManager, ttsManagerMethodHookFinal, string, null, 0);
 						} catch (NoSuchMethodError e) {
 							e.printStackTrace();
