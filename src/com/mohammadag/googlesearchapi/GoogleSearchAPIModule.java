@@ -125,7 +125,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 			ttsManagerHook = "aCT";
 			ttsManagerMethodHook = "a";
 					
-			SearchResultFetcherQueryHook = "w";
+			SearchResultFetcherQueryHook = "x";
 				    
 			searchQueryTextHook = "bqk";
 			mCacheHook = "mCache";
