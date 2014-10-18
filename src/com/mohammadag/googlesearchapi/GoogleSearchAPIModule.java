@@ -71,10 +71,10 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		if (!lpparam.packageName.equals(Constants.GOOGLE_SEARCH_PACKAGE))
 			return;
 
-	// Thank you to KeepChat For the Following Code Snippet
-	// http://git.io/JJZPaw
+		// Thank you to KeepChat For the Following Code Snippet
+		// http://git.io/JJZPaw
 		
-	Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
+		Object activityThread = callStaticMethod(findClass("android.app.ActivityThread", null), "currentActivityThread");
         Context context = (Context) callMethod(activityThread, "getSystemContext");
 
         String versionName = context.getPackageManager().getPackageInfo(lpparam.packageName, 0).versionName;
@@ -108,12 +108,35 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		
 		
 		
-		XposedBridge.log("Google Search Version"+Checker+" And Version Code "+versionCheck);
-		
-		
+		XposedBridge.log("Version Code: "+versionCheck);
 
 		//Newest Version
-		if(versionCheck >= 300306140 || versionCheck == 300306130) {
+        if(versionCheck >= 300306260) {
+            SearchControllerClassHook = "cjq";
+            MyVoiceSearchControllerListenerClassHook = "cjw";
+            SearchResultFetcherClassHook = "cmt";
+            SearchOverlayImplClassHook = "ebj";
+
+            mContextHook = "mContext";
+
+            mVoiceSearchServicesHook = "mVoiceSearchServices";
+            ttsManagerHook = "aPi";
+            ttsManagerMethodHook = "a";
+
+            SearchResultFetcherQueryHook = "g";
+
+            searchQueryTextHook = "ckd";
+            mCacheHook = "mCache";
+            mClockHook = "mClock";
+            mCacheResultHook = "a";
+
+            MyVoiceSearchControllerListenerMethodHook = "a";
+            CharSequenceClassHook = "ijg";
+            CharSequenceClassHook2 = "cmn";
+        }
+
+        //Older Versions
+		if(versionCheck == 300306140 || versionCheck == 300306130) {
 			SearchControllerClassHook = "bpn";
 			MyVoiceSearchControllerListenerClassHook = "bpy";
 			SearchResultFetcherClassHook = "cby";
@@ -136,8 +159,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 			CharSequenceClassHook = "hmu";
 			CharSequenceClassHook2 = "cbs";
 		}
-		
-		//Older Versions
+
 		if(versionCheck == 300305160) {
 			SearchControllerClassHook = "bir";
 			MyVoiceSearchControllerListenerClassHook = "bjb";
@@ -221,11 +243,11 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 			
 		final String mVoiceSearchServicesHookFinal = mVoiceSearchServicesHook;
 		final String ttsManagerHookFinal = ttsManagerHook;
-		final String ttsManagerMethodHookFinal = ttsManagerMethodHook;
+	    final String ttsManagerMethodHookFinal = ttsManagerMethodHook;
 		
-	    	final String SearchResultFetcherQueryHookFinal = SearchResultFetcherQueryHook;
+	    final String SearchResultFetcherQueryHookFinal = SearchResultFetcherQueryHook;
 	    
-	    	final String searchQueryTextHookFinal = searchQueryTextHook;
+	    final String searchQueryTextHookFinal = searchQueryTextHook;
 		final String mCacheHookFinal = mCacheHook;
 		final String mClockHookFinal = mClockHook;
 		final String mCacheResultHookFinal = mCacheResultHook;
@@ -234,27 +256,29 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		final String CharSequenceClassHookFinal = CharSequenceClassHook;
 		final String CharSequenceClassHook2Final = CharSequenceClassHook2;
 
+        XposedBridge.log("First Hook: " +SearchControllerClassHookFinal);
+
 		// com.google.android.search.shared.api.Query
 		Class<?> Query = findClass("com.google.android.shared.search.Query", lpparam.classLoader);
 
-        	// com.google.android.search.core.SearchController
-        	// Google Search V3.4: azs
-        	// Google Search V3.5: bir
-        	Class<?> SearchController = findClass(SearchControllerClassHookFinal, lpparam.classLoader);
+        // com.google.android.search.core.SearchController
+        // Google Search V3.4: azs
+        // Google Search V3.5: bir
+        Class<?> SearchController = findClass(SearchControllerClassHookFinal, lpparam.classLoader);
 
 		// com.google.android.search.core.SearchController$MyVoiceSearchControllerListener
-        	// Google Search V3.4: bae
-        	// Google Search V3.5: bjb
+        // Google Search V3.4: bae
+        // Google Search V3.5: bjb
 		Class<?> MyVoiceSearchControllerListener = findClass(MyVoiceSearchControllerListenerClassHookFinal, lpparam.classLoader);
 		
 		// com.google.android.search.core.prefetch.SearchResultFetcher
-        	// Google Search V3.4: blq
-        	// Google Search V3.5: bur
+        // Google Search V3.4: blq
+        // Google Search V3.5: bur
 		Class<?> SearchResultFetcher = findClass(SearchResultFetcherClassHookFinal, lpparam.classLoader);
 		
 		// com.google.android.search.gel.SearchOverlayImpl
-        	// Google Search V3.4: ccu
-        	// Google Search V3.5: cmh
+        // Google Search V3.4: ccu
+        // Google Search V3.5: cmh
 		Class<?> SearchOverlayImpl = findClass(SearchOverlayImplClassHookFinal, lpparam.classLoader);
 
 		XposedBridge.hookAllConstructors(SearchController, new XC_MethodHook() {
@@ -274,12 +298,12 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 						
 						Object mVoiceSearchServices = getObjectField(thisObject, mVoiceSearchServicesHookFinal);
 						// getLocalTtsManager
-                        			// Google Search V3.4: asi
-                        			// Google Search V3.5: azL
+                        // Google Search V3.4: asi
+                        // Google Search V3.5: azL
 						Object ttsManager = XposedHelpers.callMethod(mVoiceSearchServices, ttsManagerHookFinal);
 						try {
-                        			// Google Search V3.4: a
-                        			// Google Search V3.5: a
+                        // Google Search V3.4: a
+                        // Google Search V3.5: a
 						XposedHelpers.callMethod(ttsManager, ttsManagerMethodHookFinal, string, null, 0);
 						} catch (NoSuchMethodError e) {
 							e.printStackTrace();
@@ -306,8 +330,9 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		});
 
 		// obtainSearchResult
-        	// Google Search V3.4: s
-        	// Google Search V3.5: w
+        // Google Search V3.4: s
+        // Google Search V3.5: w
+				
 		findAndHookMethod(SearchResultFetcher, SearchResultFetcherQueryHookFinal, Query, new XC_MethodHook() {
 			@Override
 			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
@@ -343,8 +368,8 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		});
 
 		// onRecognitionResult
-        	// Google Search V3.4: s // a(CharSequence paramCharSequence, glq paramglq, blk paramblk)
-        	// Google Search V3.5: w // a(CharSequence paramCharSequence, hea paramhea, bul parambul)
+        // Google Search V3.4: s // a(CharSequence paramCharSequence, glq paramglq, blk paramblk)
+        // Google Search V3.5: w // a(CharSequence paramCharSequence, hea paramhea, bul parambul)
 		findAndHookMethod(MyVoiceSearchControllerListener, MyVoiceSearchControllerListenerMethodHookFinal, CharSequence.class, findClass(CharSequenceClassHookFinal, lpparam.classLoader), findClass(CharSequenceClassHook2Final, lpparam.classLoader), new XC_MethodHook() {
 			@Override
 			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
