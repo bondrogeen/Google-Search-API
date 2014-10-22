@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.speech.tts.TextToSpeech;
 import android.text.TextUtils;
+import android.util.Log;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -110,8 +111,9 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		
 		XposedBridge.log("Version Code: "+versionCheck);
 
+
 		//Newest Version
-        if(versionCheck >= 300306260) {
+        if(versionCheck >= 300306260 && versionCheck != 300308000) {
             SearchControllerClassHook = "cjq";
             MyVoiceSearchControllerListenerClassHook = "cjw";
             SearchResultFetcherClassHook = "cmt";
@@ -133,6 +135,30 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
             MyVoiceSearchControllerListenerMethodHook = "a";
             CharSequenceClassHook = "ijg";
             CharSequenceClassHook2 = "cmn";
+        }
+
+        if(versionCheck == 300308000) {
+            SearchControllerClassHook = "bpo";
+            MyVoiceSearchControllerListenerClassHook = "bpz";
+            SearchResultFetcherClassHook = "ccf";
+            SearchOverlayImplClassHook = "cuj";
+
+            mContextHook = "mContext";
+
+            mVoiceSearchServicesHook = "mVoiceSearchServices";
+            ttsManagerHook = "aCZ";
+            ttsManagerMethodHook = "a";
+
+            SearchResultFetcherQueryHook = "x";
+
+            searchQueryTextHook = "bql";
+            mCacheHook = "mCache";
+            mClockHook = "mClock";
+            mCacheResultHook = "a";
+
+            MyVoiceSearchControllerListenerMethodHook = "a";
+            CharSequenceClassHook = "hnc";
+            CharSequenceClassHook2 = "cbz";
         }
 
         //Older Versions
