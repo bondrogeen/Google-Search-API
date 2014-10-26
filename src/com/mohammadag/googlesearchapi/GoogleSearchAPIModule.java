@@ -113,7 +113,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 
 
 		//Newest Version
-        if(versionCheck >= 300306260 && versionCheck != 300308000) {
+        if(versionCheck >= 300306260 && versionCheck < 300308000) {
             SearchControllerClassHook = "cjq";
             MyVoiceSearchControllerListenerClassHook = "cjw";
             SearchResultFetcherClassHook = "cmt";
@@ -137,7 +137,31 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
             CharSequenceClassHook2 = "cmn";
         }
 
-        if(versionCheck == 300308000) {
+        if (versionCheck >= 300306150 && versionCheck < 300306260) {
+            SearchControllerClassHook = "bpn";
+            MyVoiceSearchControllerListenerClassHook = "bpy";
+            SearchResultFetcherClassHook = "cby";
+            SearchOverlayImplClassHook = "cuc";
+
+            mContextHook = "mContext";
+
+            mVoiceSearchServicesHook = "mVoiceSearchServices";
+            ttsManagerHook = "aCT";
+            ttsManagerMethodHook = "a";
+
+            SearchResultFetcherQueryHook = "x";
+
+            searchQueryTextHook = "bqk";
+            mCacheHook = "mCache";
+            mClockHook = "mClock";
+            mCacheResultHook = "a";
+
+            MyVoiceSearchControllerListenerMethodHook = "a";
+            CharSequenceClassHook = "hmu";
+            CharSequenceClassHook2 = "cbs";
+        }
+
+        if(versionCheck >= 300308000) {
             SearchControllerClassHook = "bpo";
             MyVoiceSearchControllerListenerClassHook = "bpz";
             SearchResultFetcherClassHook = "ccf";
