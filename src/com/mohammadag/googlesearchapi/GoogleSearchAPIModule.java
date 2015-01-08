@@ -112,7 +112,31 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		XposedBridge.log("Version Code: "+versionCheck);
 
 
-		//Newest Version
+        if(versionCheck >= 300401210) {
+            SearchControllerClassHook = "cws";
+            MyVoiceSearchControllerListenerClassHook = "cwx";
+            SearchResultFetcherClassHook = "dap";
+            SearchOverlayImplClassHook = "erb";
+
+            mContextHook = "mContext";
+
+            mVoiceSearchServicesHook = "mVoiceSearchServices";
+            ttsManagerHook = "aRm";
+            ttsManagerMethodHook = "a";
+
+            SearchResultFetcherQueryHook = "C";
+
+            searchQueryTextHook = "cxr";
+            mCacheHook = "mCache";
+            mClockHook = "mClock";
+            mCacheResultHook = "a";
+
+            MyVoiceSearchControllerListenerMethodHook = "a";
+            CharSequenceClassHook = "isi";
+            CharSequenceClassHook2 = "daj";
+        }
+
+		//3.6.16
         if(versionCheck >= 300306260 && versionCheck < 300308000) {
             SearchControllerClassHook = "cjq";
             MyVoiceSearchControllerListenerClassHook = "cjw";
@@ -137,6 +161,7 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
             CharSequenceClassHook2 = "cmn";
         }
 
+        //Google Search 3.6.15
         if (versionCheck >= 300306150 && versionCheck < 300306260) {
             SearchControllerClassHook = "bpn";
             MyVoiceSearchControllerListenerClassHook = "bpy";
@@ -161,28 +186,29 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
             CharSequenceClassHook2 = "cbs";
         }
 
-        if(versionCheck >= 300308000) {
-            SearchControllerClassHook = "bpo";
-            MyVoiceSearchControllerListenerClassHook = "bpz";
-            SearchResultFetcherClassHook = "ccf";
-            SearchOverlayImplClassHook = "cuj";
+        //Google Search 4.0+
+        if(versionCheck == 300308000) {
+            SearchControllerClassHook = "cjq";
+            MyVoiceSearchControllerListenerClassHook = "cjw";
+            SearchResultFetcherClassHook = "cmt";
+            SearchOverlayImplClassHook = "ebj";
 
             mContextHook = "mContext";
 
             mVoiceSearchServicesHook = "mVoiceSearchServices";
-            ttsManagerHook = "aCZ";
+            ttsManagerHook = "aPi";
             ttsManagerMethodHook = "a";
 
-            SearchResultFetcherQueryHook = "x";
+            SearchResultFetcherQueryHook = "g";
 
-            searchQueryTextHook = "bql";
+            searchQueryTextHook = "ckd";
             mCacheHook = "mCache";
             mClockHook = "mClock";
             mCacheResultHook = "a";
 
             MyVoiceSearchControllerListenerMethodHook = "a";
-            CharSequenceClassHook = "hnc";
-            CharSequenceClassHook2 = "cbz";
+            CharSequenceClassHook = "ijg";
+            CharSequenceClassHook2 = "cmn";
         }
 
         //Older Versions
@@ -376,44 +402,6 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 				iF.addAction(Constants.INTENT_QUEUE_INTENT);
 
 				mContext.registerReceiver(internalReceiver, iF);
-			}
-		});
-
-		// obtainSearchResult
-        // Google Search V3.4: s
-        // Google Search V3.5: w
-				
-		findAndHookMethod(SearchResultFetcher, SearchResultFetcherQueryHookFinal, Query, new XC_MethodHook() {
-			@Override
-			protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-		
-				Object queryResult = param.args[0];
-				CharSequence searchQueryText = (CharSequence) getObjectField(queryResult, searchQueryTextHookFinal);
-				Object mCache = getObjectField(param.thisObject, mCacheHookFinal);
-				Object mClock = getObjectField(param.thisObject, mClockHookFinal);
-				Object mCachedResult = XposedHelpers.callMethod(mCache, mCacheResultHookFinal, queryResult,
-						XposedHelpers.callMethod(mClock, "elapsedRealtime"),
-						true);
-				
-				mPreferences.reload();
-
-				/* Not doing this causes a usability issue. If the user has a search showing
-				 * results, and they tap the mic, then cancel the voice search, then the search
-				 * is handled again, thus throwing the user in an infinite loop of pressing back,
-				 * until the user figures it out and uses the task switcher to close Google Search.
-				 */
-				if (mCachedResult != null && mContext != null
-						&& mPreferences.getBoolean(Constants.KEY_PREVENT_DUPLICATES, true)) {
-					return;
-				}
-
-				if (mContext != null) {
-					broadcastGoogleSearch(mContext, searchQueryText, false,
-							mPreferences.getBoolean(Constants.KEY_DELAY_BROADCASTS, false));
-				} else {
-					XposedBridge.log(String.format("Google Search API: New Search detected: %s",
-							searchQueryText.toString()));
-				}
 			}
 		});
 
