@@ -111,8 +111,24 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		
 		XposedBridge.log("Version Code: "+versionCheck);
 
+        if (versionCheck >= 300401290) {
+            SearchControllerClassHook = "cws";
+            MyVoiceSearchControllerListenerClassHook = "cwx";
+            SearchResultFetcherClassHook = "dap";
+            SearchOverlayImplClassHook = "erb";
 
-        if(versionCheck >= 300401210) {
+            mContextHook = "mContext";
+
+            mVoiceSearchServicesHook = "mVoiceSearchServices";
+            ttsManagerHook = "aRn";
+            ttsManagerMethodHook = "a";
+
+            MyVoiceSearchControllerListenerMethodHook = "a";
+            CharSequenceClassHook = "isj";
+            CharSequenceClassHook2 = "daj";
+        }
+
+        if(versionCheck == 300401210) {
             SearchControllerClassHook = "cws";
             MyVoiceSearchControllerListenerClassHook = "cwx";
             SearchResultFetcherClassHook = "dap";
@@ -320,13 +336,6 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
 		final String mVoiceSearchServicesHookFinal = mVoiceSearchServicesHook;
 		final String ttsManagerHookFinal = ttsManagerHook;
 	    final String ttsManagerMethodHookFinal = ttsManagerMethodHook;
-		
-	    final String SearchResultFetcherQueryHookFinal = SearchResultFetcherQueryHook;
-	    
-	    final String searchQueryTextHookFinal = searchQueryTextHook;
-		final String mCacheHookFinal = mCacheHook;
-		final String mClockHookFinal = mClockHook;
-		final String mCacheResultHookFinal = mCacheResultHook;
 	    
 		final String MyVoiceSearchControllerListenerMethodHookFinal = MyVoiceSearchControllerListenerMethodHook;
 		final String CharSequenceClassHookFinal = CharSequenceClassHook;
@@ -346,12 +355,12 @@ public class GoogleSearchAPIModule implements IXposedHookLoadPackage, IXposedHoo
         // Google Search V3.4: bae
         // Google Search V3.5: bjb
 		Class<?> MyVoiceSearchControllerListener = findClass(MyVoiceSearchControllerListenerClassHookFinal, lpparam.classLoader);
-		
+
 		// com.google.android.search.core.prefetch.SearchResultFetcher
         // Google Search V3.4: blq
         // Google Search V3.5: bur
 		Class<?> SearchResultFetcher = findClass(SearchResultFetcherClassHookFinal, lpparam.classLoader);
-		
+
 		// com.google.android.search.gel.SearchOverlayImpl
         // Google Search V3.4: ccu
         // Google Search V3.5: cmh
