@@ -1,0 +1,21 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion '20.0.0'
+    defaultConfig {
+        applicationId "com.mohammadag.googlesearchapi"
+        minSdkVersion 16
+        targetSdkVersion 19
+        versionCode 23
+        versionName '1.5c'
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    provided fileTree(include: ['*.jar'], dir: 'deps')
+    compile 'com.android.support:support-v4:20+'
+}
