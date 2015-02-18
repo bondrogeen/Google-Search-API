@@ -30,11 +30,11 @@ public class IntroFragment extends Fragment {
 
 		mStatusTextView = (TextView) view.findViewById(R.id.status_text);
 
-		if (UiUtils.isHookActive()) {
-			setStatusText(R.string.we_have_liftoff);
+		if (mStatusTextView.getText().toString().contains("Status: Up and running")) {
+            setStatusText(R.string.we_have_liftoff);
 		} else {
-			setStatusText(R.string.we_have_a_problem);
-		}
+            setStatusText(R.string.we_have_a_problem);
+        }
 
 		Drawable icon = UiUtils.getGoogleSearchIcon(getActivity());
 		if (icon == null) {
@@ -98,10 +98,10 @@ public class IntroFragment extends Fragment {
 	}
 
 	private void setStatusText(int resId) {
-		setStatusText(getString(resId));
+		setStatusString(getString(resId));
 	}
 
-	private void setStatusText(String text) {
+	private void setStatusString(String text) {
 		mStatusTextView.setText(Html.fromHtml(getString(R.string.status_text, text)));
 	}
 }

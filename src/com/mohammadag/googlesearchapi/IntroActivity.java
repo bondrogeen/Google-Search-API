@@ -1,14 +1,21 @@
 package com.mohammadag.googlesearchapi;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 import java.util.Set;
+
+import de.robv.android.xposed.XposedBridge;
 
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.content.pm.PackageInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
@@ -19,6 +26,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
+import android.widget.Toast;
 
 public class IntroActivity extends FragmentActivity implements OnInitListener {
 	SectionsPagerAdapter mSectionsPagerAdapter;
@@ -40,11 +48,11 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
 	public IntroFragment mIntroFragment;
 	public PluginsFragment mPluginsFragment;
 	private BroadcastReceiver mPackageReceiver;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		Set<String> categories = getIntent().getCategories();
 		if (categories != null) {
 			if (categories.contains("de.robv.android.xposed.category.MODULE_SETTINGS")) {
@@ -194,6 +202,42 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
 		}
 	}
 
+	class PInfo {
+	    private String pname = "";
+	    private String versionName = "";
+	    private void prettyPrint() {
+	    }
+	}
+
+	private ArrayList<PInfo> getPackages() {
+	    ArrayList<PInfo> apps = getInstalledApps(false); /* false = no system packages */
+	    final int max = apps.size();
+	    for (int i=0; i<max; i++) {
+	        apps.get(i).prettyPrint();
+	    }
+	    return apps;
+	}
+
+	private ArrayList<PInfo> getInstalledApps(boolean getSysPackages) {
+	    ArrayList<PInfo> res = new ArrayList<PInfo>();        
+	    List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
+	    for(int i=0;i<packs.size();i++) {
+	        PackageInfo p = packs.get(i);
+	        if ((!getSysPackages) && (p.versionName == null)) {
+	            continue ;
+	        }
+	        PInfo newInfo = new PInfo();
+	        newInfo.pname = p.packageName;
+	        newInfo.versionName = p.versionName;
+	        
+	        if (newInfo.pname.equals("com.google.android.googlequicksearchbox")) {
+	     		Toast.makeText(getApplicationContext(), newInfo.versionName,
+	 	 			   Toast.LENGTH_LONG).show();
+	        }
+	    }
+	    return res; 
+	}
+	
 	/* From http://stackoverflow.com/a/363692 */
 	private static int randInt(int min, int max) {
 		// Usually this can be a field rather than a method variable
