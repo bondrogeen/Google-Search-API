@@ -1,5 +1,9 @@
 package com.mohammadag.googlesearchapi;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -15,9 +19,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.app.Fragment;
@@ -25,8 +32,18 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.entity.BufferedHttpEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
 
 public class IntroActivity extends FragmentActivity implements OnInitListener {
 	SectionsPagerAdapter mSectionsPagerAdapter;
@@ -48,11 +65,20 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
 	public IntroFragment mIntroFragment;
 	public PluginsFragment mPluginsFragment;
 	private BroadcastReceiver mPackageReceiver;
+    int version = 123;
+    String Code = "Missing";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
+        SharedPreferences prfs = getSharedPreferences("Hooks", Context.MODE_WORLD_READABLE);
+        String hookcheck = prfs.getString("Hooks", null);
+
+        if (hookcheck == null) {
+            getHooksHttp();
+        }
+
 		Set<String> categories = getIntent().getCategories();
 		if (categories != null) {
 			if (categories.contains("de.robv.android.xposed.category.MODULE_SETTINGS")) {
@@ -178,6 +204,9 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
 			donate.setData(Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5MW3FZSKRSP3Ll"));
 			startActivity(donate);
 			return true;
+        case R.id.menu_hooks:
+                getHooksHttp();
+                return true;
 		case android.R.id.home:
 			onBackPressed();
 			return true;
@@ -237,7 +266,7 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
 	    }
 	    return res; 
 	}
-	
+
 	/* From http://stackoverflow.com/a/363692 */
 	private static int randInt(int min, int max) {
 		// Usually this can be a field rather than a method variable
@@ -249,4 +278,137 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
 
 		return randomNum;
 	}
+
+    public void getHooksHttp () {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+
+        List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
+        for(int i=0;i<packs.size();i++) {
+            PackageInfo p = packs.get(i);
+            if (p.packageName.equals(Constants.GOOGLE_SEARCH_PACKAGE)) {
+                version = p.versionCode;
+            }
+        }
+
+        StringBuilder total = null;
+        int broke = 0;
+
+        try {
+            DefaultHttpClient httpclient = new DefaultHttpClient();
+            HttpGet httppost = new HttpGet("http://pastebin.com/raw.php?i=znLZVSi2");
+            HttpResponse response = null;
+            try {
+                response = httpclient.execute(httppost);
+            } catch (ClientProtocolException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            HttpEntity ht = response.getEntity();
+
+            BufferedHttpEntity buf = null;
+            try {
+                buf = new BufferedHttpEntity(ht);
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            InputStream is = null;
+            try {
+                is = buf.getContent();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+
+            BufferedReader r = new BufferedReader(new InputStreamReader(is));
+
+            total = new StringBuilder();
+            String line;
+            try {
+                while ((line = r.readLine()) != null) {
+                    total.append(line);
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.out.println("Broke");
+            broke = 1;
+        }
+
+
+        if (broke == 0) {
+
+            SharedPreferences prfs = getSharedPreferences("Hooks", Context.MODE_WORLD_READABLE);
+            int savedVersion = prfs.getInt("Version", 1);
+            String hookcheck = prfs.getString("Hooks", null);
+
+            Toast toast;
+
+            String hooks = total.toString();
+            String[] html = hooks.split("<p>");
+
+            int count = 0;
+            int max = 0;
+            for (String data : html) {
+                max++;
+            }
+
+            String hook = null;
+
+            for (String data : html) {
+                count++;
+                Code = Integer.toString(version);
+                if (data.contains(Code)) {
+                    data = data.replace("<p>", "");
+                    data = data.replace("</p>", "");
+                    Hooks(data);
+                    hook = data;
+                    count = 69;
+                } else {
+                    if (count == max) {
+                        System.out.println("Trying default hook!");
+                        String fallback = html[1];
+                        fallback = fallback.replace("<p>", "");
+                        fallback = fallback.replace("</p>", "");
+                        hook = fallback;
+                        Hooks(fallback);
+                    }
+                }
+            }
+
+            if (version == savedVersion && hookcheck.equals(hook)) {
+                toast = Toast.makeText(getApplicationContext(), "You already have the latest hooks", Toast.LENGTH_LONG);
+            } else {
+                toast = Toast.makeText(getApplicationContext(), "Hooks have been updated.\nPlease reboot!", Toast.LENGTH_LONG);
+            }
+            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+            if( v != null) v.setGravity(Gravity.CENTER);
+            toast.show();
+        } else {
+            Toast toast= Toast.makeText(getApplicationContext(), "Something went wrong.\nPlease check your data connection.", Toast.LENGTH_LONG);
+            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+            if( v != null) v.setGravity(Gravity.CENTER);
+            toast.show();
+        }
+    }
+
+    public void Hooks (String data) {
+        String[] split = data.split(";");
+            SharedPreferences.Editor editor = getSharedPreferences("Hooks", Context.MODE_WORLD_READABLE).edit();
+            editor.putString("First", split[1]);
+            editor.putString("Second", split[2]);
+            editor.putString("Third", split[3]);
+            editor.putString("Fourth", split[4]);
+            editor.putString("Hooks", data);
+            editor.putInt("Version", version);
+            editor.apply();
+    }
 }

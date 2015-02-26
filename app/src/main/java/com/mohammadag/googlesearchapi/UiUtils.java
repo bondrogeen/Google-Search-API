@@ -33,6 +33,7 @@ public class UiUtils {
 		return false;
 	}
 
+
 	public static Drawable getGoogleSearchIcon(Context context) {
 		try {
 			return context.getPackageManager().getApplicationIcon(Constants.GOOGLE_SEARCH_PACKAGE);

@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.text.Html;
@@ -19,6 +20,7 @@ import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 
 public class IntroFragment extends Fragment {
 	private TextView mStatusTextView;
@@ -44,6 +46,7 @@ public class IntroFragment extends Fragment {
 			iconView.setImageDrawable(icon);
 			//getActionBar().setIcon(icon);
 		}
+
 
 		mToggleActivityVisibilityButton = (Button) view.findViewById(R.id.button1);
 		mToggleActivityVisibilityButton.setText(UiUtils.getActivityVisibleInDrawer(getActivity()) ? R.string.hide_app : R.string.show_app);
@@ -96,6 +99,8 @@ public class IntroFragment extends Fragment {
 		});
 		return view;
 	}
+
+
 
 	private void setStatusText(int resId) {
 		setStatusString(getString(resId));

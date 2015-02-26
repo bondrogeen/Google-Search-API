@@ -12,6 +12,8 @@
         android:protectionLevel="normal" />
 
     <uses-permission android:name="com.mohammadag.googlesearchapi.permission.ACCESS_GGOGLE_SEARCH_API" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+
 
     <uses-sdk
         android:minSdkVersion="16"

@@ -12,5 +12,9 @@
         android:id="@+id/menu_donate"
         android:title="@string/donate">
     </item>
+    <item
+        android:id="@+id/menu_hooks"
+        android:title="@string/hooks">
+    </item>
 
 </menu>

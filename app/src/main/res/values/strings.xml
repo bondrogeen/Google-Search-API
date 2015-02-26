@@ -27,6 +27,7 @@
     <string name="title_section2">Plugins</string>
     <string name="no_ui_plugin">This plugin has no UI</string>
     <string name="donate">Donate</string>
+    <string name="hooks">Update Hooks</string>
     <string name="prevent_duplicates">Prevent duplicate searches</string>
 
 </resources>
