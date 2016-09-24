@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -15,6 +18,7 @@ import de.robv.android.xposed.XposedBridge;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -23,6 +27,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.speech.tts.TextToSpeech;
@@ -32,9 +37,11 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,9 +72,101 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
 	public IntroFragment mIntroFragment;
 	public PluginsFragment mPluginsFragment;
 	private BroadcastReceiver mPackageReceiver;
-    int version = 123;
+    String version = "123";
     String Code = "Missing";
-	
+
+	class RequestTask extends AsyncTask<String, String, String> {
+
+		@Override
+		protected String doInBackground(String... uri) {
+			String responseString = "Nope";
+
+			try {
+				URL u = new URL(uri[0]);
+				URLConnection c = u.openConnection();
+				c.connect();
+
+				InputStream inputStream = c.getInputStream();
+
+				responseString = convertStreamToString(inputStream);
+			} catch (Exception e) {
+				responseString = "Nope";
+			}
+
+
+			return responseString;
+		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			super.onPostExecute(result);
+
+			List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
+			for (int i = 0; i < packs.size(); i++) {
+				PackageInfo p = packs.get(i);
+				if (p.packageName.equals("com.google.android.googlequicksearchbox")) {
+					version = Integer.toString(p.versionCode);
+					version = version.substring(0, version.length() - 1);
+				}
+			}
+
+			SharedPreferences prfs = getSharedPreferences("Hooks", Context.MODE_WORLD_READABLE);
+			String text = prfs.getString("Hooks", "365457356");
+
+			String toast = "Hooks have been updated.\nPlease reboot!";
+
+
+			String[] html = result.split("<p>");
+
+			String matched = "No";
+
+			int count = 0;
+			int max = 0;
+			for (String data : html) {
+				max++;
+			}
+
+			for (String data : html) {
+				count++;
+
+				String finalCheck = "123";
+
+				if (!data.isEmpty()) {
+					String[] PasteVersion = data.split(";");
+					finalCheck = PasteVersion[0];
+				}
+
+				if (version.equals(finalCheck) && !data.isEmpty()) {
+					data = data.replace("<p>", "");
+					data = data.replace("</p>", "");
+					if (data.trim().equals(text.trim())) {
+						toast = "You already have the latest hooks";
+					} else {
+						toast = "Hooks have been updated.\nPlease reboot!";
+						Hooks(data);
+					}
+					matched = "Yes";
+				} else {
+					if (count == max && matched.equals("No")) {
+						System.out.println("Trying default hook!");
+						String fallback = html[1];
+						fallback = fallback.replace("<p>", "");
+						fallback = fallback.replace("</p>", "");
+						fallback = fallback.replaceAll("[0-9]", "");
+						String SavedHooks = text.replaceAll("[0-9]", "");
+						if (fallback.trim().equals(SavedHooks.trim())) {
+							toast = "You already have the latest hooks";
+						} else {
+							Hooks(fallback);
+							toast = "Hooks have been updated.\nPlease reboot!";
+						}
+					}
+				}
+			}
+			setToast(toast);
+		}
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -75,9 +174,6 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
         SharedPreferences prfs = getSharedPreferences("Hooks", Context.MODE_WORLD_READABLE);
         String hookcheck = prfs.getString("Hooks", null);
 
-        if (hookcheck == null) {
-            getHooksHttp();
-        }
 
 		Set<String> categories = getIntent().getCategories();
 		if (categories != null) {
@@ -199,14 +295,39 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
 			i.setData(Uri.parse("http://mohammadag.xceleo.org/redirects/google_now_api.html"));
 			startActivity(i);
 			return true;
+        case R.id.menu_change:
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Paste The New Hooks");
+
+            final EditText input = new EditText(this);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    SharedPreferences.Editor editor = getSharedPreferences("Hooks", Context.MODE_WORLD_READABLE).edit();
+                    editor.putString("First", input.getText().toString());
+                    editor.apply();
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+            return true;
 		case R.id.menu_donate:
 			Intent donate = new Intent(Intent.ACTION_VIEW);
 			donate.setData(Uri.parse("https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=5MW3FZSKRSP3Ll"));
 			startActivity(donate);
 			return true;
         case R.id.menu_hooks:
-                getHooksHttp();
-                return true;
+            new RequestTask().execute("http://pastebin.com/raw.php?i=znLZVSi2");
+            return true;
 		case android.R.id.home:
 			onBackPressed();
 			return true;
@@ -279,136 +400,40 @@ public class IntroActivity extends FragmentActivity implements OnInitListener {
 		return randomNum;
 	}
 
-    public void getHooksHttp () {
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
-
-        List<PackageInfo> packs = getPackageManager().getInstalledPackages(0);
-        for(int i=0;i<packs.size();i++) {
-            PackageInfo p = packs.get(i);
-            if (p.packageName.equals(Constants.GOOGLE_SEARCH_PACKAGE)) {
-                version = p.versionCode;
-            }
-        }
-
-        StringBuilder total = null;
-        int broke = 0;
-
-        try {
-            DefaultHttpClient httpclient = new DefaultHttpClient();
-            HttpGet httppost = new HttpGet("http://pastebin.com/raw.php?i=znLZVSi2");
-            HttpResponse response = null;
-            try {
-                response = httpclient.execute(httppost);
-            } catch (ClientProtocolException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            HttpEntity ht = response.getEntity();
-
-            BufferedHttpEntity buf = null;
-            try {
-                buf = new BufferedHttpEntity(ht);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            InputStream is = null;
-            try {
-                is = buf.getContent();
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-
-            BufferedReader r = new BufferedReader(new InputStreamReader(is));
-
-            total = new StringBuilder();
-            String line;
-            try {
-                while ((line = r.readLine()) != null) {
-                    total.append(line);
-                }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            System.out.println("Broke");
-            broke = 1;
-        }
-
-
-        if (broke == 0) {
-
-            SharedPreferences prfs = getSharedPreferences("Hooks", Context.MODE_WORLD_READABLE);
-            int savedVersion = prfs.getInt("Version", 1);
-            String hookcheck = prfs.getString("Hooks", null);
-
-            Toast toast;
-
-            String hooks = total.toString();
-            String[] html = hooks.split("<p>");
-
-            int count = 0;
-            int max = 0;
-            for (String data : html) {
-                max++;
-            }
-
-            String hook = null;
-
-            for (String data : html) {
-                count++;
-                Code = Integer.toString(version);
-                if (data.contains(Code)) {
-                    data = data.replace("<p>", "");
-                    data = data.replace("</p>", "");
-                    Hooks(data);
-                    hook = data;
-                    count = 69;
-                } else {
-                    if (count == max) {
-                        System.out.println("Trying default hook!");
-                        String fallback = html[1];
-                        fallback = fallback.replace("<p>", "");
-                        fallback = fallback.replace("</p>", "");
-                        hook = fallback;
-                        Hooks(fallback);
-                    }
-                }
-            }
-
-            if (version == savedVersion && hookcheck.equals(hook)) {
-                toast = Toast.makeText(getApplicationContext(), "You already have the latest hooks", Toast.LENGTH_LONG);
-            } else {
-                toast = Toast.makeText(getApplicationContext(), "Hooks have been updated.\nPlease reboot!", Toast.LENGTH_LONG);
-            }
-            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
-            if( v != null) v.setGravity(Gravity.CENTER);
-            toast.show();
-        } else {
-            Toast toast= Toast.makeText(getApplicationContext(), "Something went wrong.\nPlease check your data connection.", Toast.LENGTH_LONG);
-            TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
-            if( v != null) v.setGravity(Gravity.CENTER);
-            toast.show();
-        }
-    }
+	public void setToast(String message) {
+		Toast toast = Toast.makeText(IntroActivity.this, message, Toast.LENGTH_SHORT);
+		TextView v = (TextView) toast.getView().findViewById(android.R.id.message);
+		if (v != null) v.setGravity(Gravity.CENTER);
+		toast.show();
+	}
 
     public void Hooks (String data) {
         String[] split = data.split(";");
-            SharedPreferences.Editor editor = getSharedPreferences("Hooks", Context.MODE_WORLD_READABLE).edit();
-            editor.putString("First", split[1]);
-            editor.putString("Second", split[2]);
-            editor.putString("Third", split[3]);
-            editor.putString("Fourth", split[4]);
-            editor.putString("Hooks", data);
-            editor.putInt("Version", version);
-            editor.apply();
+		SharedPreferences.Editor editor = getSharedPreferences("Hooks", Context.MODE_WORLD_READABLE).edit();
+		editor.putString("First", split[1]);
+		editor.putString("Second", split[2]);
+		editor.putString("Hooks", data);
+		editor.putString("Version", version);
+		editor.apply();
     }
+
+	private static String convertStreamToString(InputStream is) throws UnsupportedEncodingException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+		StringBuilder sb = new StringBuilder();
+		String line = null;
+		try {
+			while ((line = reader.readLine()) != null) {
+				sb.append(line + "\n");
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				is.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return sb.toString();
+	}
 }
